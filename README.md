@@ -22,7 +22,7 @@ m2m is a python module and command line tool to assist in converting csv documen
 
 # License
 
-See LICENSE
+See LICENSE.txt
 
 Acknowledgements
 ----------------
