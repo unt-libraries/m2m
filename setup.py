@@ -12,7 +12,7 @@ setup(
     packages=['m2m'],
     scripts=['m2m/m2m.py'],
     install_requires=['pyuntl'],
-    description='Module and command line tool for mapping csv files to UNTL metadata records.',
+    description='Package and command line tool for mapping csv files to UNTL metadata records.',
     long_description='See the home page for more information.',
     classifiers=[
         'Intended Audience :: Education'
