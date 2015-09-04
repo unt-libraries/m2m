@@ -49,13 +49,8 @@ def CSVToDict(csvFileName):
 
 
 class MetadataConverterException(Exception):
-    """This is our base exception for this script"""
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return "%s" % (self.value,)
-
+    """Base class for exceptions in this package"""
+    pass
 
 class MetadataRecord(object):
 
@@ -109,7 +104,7 @@ class MetadataRecord(object):
 
         if fieldTypes[elementName] != elementType:
             raise MetadataConverterException(
-                    "Element '%s' should be of %s type, but you are attempting to add it as '%s' type." % (elementName, fieldTypes[elementName], elementType))
+                    "Element \"%s\" should be of %s type, but you are attempting to add it as \"%s\" type." % (elementName, fieldTypes[elementName], elementType))
 
         if location.strip() != "" and elementName != "publisher":
             raise MetadataConverterException("location can only be used on" +
