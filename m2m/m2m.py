@@ -92,7 +92,7 @@ class MetadataRecord(object):
         if required is True:
             if strippedValue == "":
                 raise MetadataConverterException(
-                    "Value required for element named \"%s\"" % elementName)
+                    'Value required for element named "%s"' % elementName)
 
         # if there isn't value don't continue
         if strippedValue == "":
@@ -100,11 +100,11 @@ class MetadataRecord(object):
 
         if elementName not in fieldTypes:
             raise MetadataConverterException(
-                "Element named \"%s\" not in fieldTypes" % elementName)
+                'Element named "%s" not in fieldTypes' % elementName)
 
         if fieldTypes[elementName] != elementType:
             raise MetadataConverterException(
-                    "Element \"%s\" should be of %s type, but you are attempting to add it as \"%s\" type." % (elementName, fieldTypes[elementName], elementType))
+                    'Element "%s" should be of %s type, but you are attempting to add it as "%s" type.' % (elementName, fieldTypes[elementName], elementType))
 
         if location.strip() != "" and elementName != "publisher":
             raise MetadataConverterException("location can only be used on" +
