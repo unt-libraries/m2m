@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import unittest
+
 from tests import test_m2m
 
 
