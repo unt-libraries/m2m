@@ -1,6 +1,8 @@
 import unittest
+
 from lxml import etree
 from lxml import objectify
+
 from m2m import m2m
 
 
