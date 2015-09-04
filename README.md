@@ -22,11 +22,11 @@ m2m is a python package and command line tool to assist in converting csv docume
 
 # License
 
-See LICENSE.txt
+See LICENSE.txt.
 
 Acknowledgements
 ----------------
 
-_m2m_ was developed at the UNT Libraries
+_m2m_ was developed at the UNT Libraries.
 
 If you have questions about the project feel free to contact Mark Phillips at mark.phillips@unt.edu.
