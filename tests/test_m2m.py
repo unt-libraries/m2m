@@ -57,7 +57,6 @@ class MetadataRecordTests(unittest.TestCase):
     def test_metadata_record_setup_with_date(self):
 
         record = m2m.MetadataRecord('mphillips', addDate=True)
-        print record
         self.assertIsInstance(record, m2m.MetadataRecord)
 
     def test_none_element_value_equals_none(self):
