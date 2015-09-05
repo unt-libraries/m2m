@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from lxml import etree
@@ -54,10 +55,23 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
         self.assertIsInstance(record, m2m.MetadataRecord)
 
+        s = etree.fromstring(str(record))
+        self.assertEquals(len(s.findall('meta[@qualifier="metadataCreator"]')), 1)
+
+        creator_string = s.findall('meta[@qualifier="metadataCreator"]')[0].text
+        self.assertEquals(creator_string, 'mphillips')
+
     def test_metadata_record_setup_with_date(self):
 
         record = m2m.MetadataRecord('mphillips', addDate=True)
         self.assertIsInstance(record, m2m.MetadataRecord)
+
+        s = etree.fromstring(str(record))
+        self.assertEquals(len(s.findall('meta[@qualifier="metadataCreationDate"]')), 1)
+
+        date_string_regex = re.compile('\d\d\d\d-\d\d-\d\d,\ \d\d:\d\d:\d\d')
+        meta_date_string = s.findall('meta[@qualifier="metadataCreationDate"]')[0].text
+        self.assertTrue(date_string_regex.match(meta_date_string))
 
     def test_none_element_value_equals_none(self):
         # if element value is None then it should return None.
