@@ -14,6 +14,12 @@ def xml_to_pretty_string(xml):
     s = etree.tostring(xml, pretty_print=True)
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + s
 
+class CSVToDictTests(unittest.TestCase):
+    def test_csv_to_dict(self):
+        csv_list = m2m.CSVToDict('tests/data/test.csv')
+        self.assertIsInstance(csv_list, list)
+        self.assertEquals(len(csv_list), 1)
+
 
 class MetadataRecordTests(unittest.TestCase):
 
@@ -285,8 +291,11 @@ class MetadataRecordTests(unittest.TestCase):
 
 
 def suite():
-    test_suite = unittest.makeSuite(MetadataRecordTests, 'test')
-    return test_suite
+    alltests = unittest.TestSuite()
+    alltests.addTest(unittest.makeSuite(CSVToDictTests))
+    alltests.addTest(unittest.makeSuite(MetadataRecordTests))
+
+    return alltests
 
 if __name__ == '__main__':
     unittest.main()
