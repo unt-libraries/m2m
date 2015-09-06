@@ -166,7 +166,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.tree))
 
-    def test_map_unqualified_basic_no_options(self):
+    def test_basic_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('basic', 'title', 'test_title')
 
@@ -176,7 +176,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.tree))
 
-    def test_map_qualified_basic_no_options(self):
+    def test_basic_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('basic', 'title', 'test_title', qualifier='officialtitle')
 
@@ -187,7 +187,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.tree))
 
-    def test_map_empty_qualified_basic_no_options(self):
+    def test_basic_map_empty_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('basic', 'title', 'test_title', qualifier='')
 
@@ -197,7 +197,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.tree))
 
-    def test_map_qualified_basic_with_function(self):
+    def test_basic_map_qualified_basic_with_function(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('basic', 'title', 'test_title',
                    qualifier='officialtitle',
@@ -211,7 +211,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.tree))
 
-    def test_map_unqualified_agent_no_options(self):
+    def test_agent_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('agent', 'creator', 'Phillips, Mark')
 
@@ -223,7 +223,23 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
 
-    def test_map_qualified_agent_no_options(self):
+    def test_agent_map_qualified_with_function(self):
+        record = m2m.MetadataRecord('mphillips')
+        record.map('agent', 'creator', 'Phillips, Mark',
+                   qualifier='aut',
+                   function=(lambda x: x.upper())
+                   )
+
+        self.agent_tree.creator.name = 'PHILLIPS, MARK'
+        del self.agent_tree.creator.info
+        del self.agent_tree.creator.type
+        self.agent_tree.creator.set('qualifier', 'aut')
+        self.agent_tree.meta = 'mphillips'
+        self.agent_tree.meta.set('qualifier', 'metadataCreator')
+
+        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+
+    def test_agent_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('agent', 'creator', 'Phillips, Mark', qualifier='aut')
 
@@ -236,7 +252,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
 
-    def test_map_qualified_agent_info_only(self):
+    def test_agent_map_qualified_info_only(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut', info='First Publication')
@@ -250,7 +266,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
 
-    def test_map_qualified_agent_info_and_agent_type(self):
+    def test_agent_map_qualified_info_and_agent_type(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut',
@@ -266,7 +282,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
 
-    def test_map_qualified_agent_with_location(self):
+    def test_agent_map_qualified_with_location(self):
         record = m2m.MetadataRecord('mphillips')
         record.map('agent', 'publisher', 'UNT Libraries',
                    location='Denton, Texas')
@@ -278,7 +294,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(str(record), xml_to_pretty_string(self.pub_tree))
 
-    def test_incorrect_use_of_location_in_agent_that_is_not_publisher(self):
+    def test_agent_incorrect_use_of_location_that_is_not_publisher(self):
 
         record = m2m.MetadataRecord('mphillips')
 
