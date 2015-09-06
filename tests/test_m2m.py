@@ -1,4 +1,5 @@
 import re
+import os
 import unittest
 
 from lxml import etree
@@ -304,6 +305,32 @@ class MetadataRecordTests(unittest.TestCase):
 
         expected_error = 'location can only be used on publisher element'
         self.assertEqual(str(cm.exception), expected_error)
+
+    def test_write_xml_metadata_files(self):
+        record = m2m.MetadataRecord('mphillips')
+        record.map('agent', 'publisher', 'UNT Libraries',
+                   location='Denton, Texas')
+        record.setBaseDirectory('tests')
+        record.setFolderName('test_data')
+
+        record.writeTemplateFiles(record.baseDirectory, record.foldername)
+
+        self.assertTrue(os.path.exists(record.baseDirectory))
+        self.assertTrue(os.path.exists(os.path.join(record.baseDirectory, record.foldername)))
+
+        self.pub_tree.publisher.name = 'UNT Libraries'
+        self.pub_tree.publisher.location = 'Denton, Texas'
+        self.pub_tree.meta = 'mphillips'
+        self.pub_tree.meta.set('qualifier', 'metadataCreator')
+
+        filename = os.path.join(record.baseDirectory, record.foldername, "metadata.xml")
+        record_from_file = open(filename).read()
+
+        self.assertEqual(record_from_file, xml_to_pretty_string(self.pub_tree))
+
+        # remove test files that were written 
+        os.remove(os.path.join(record.baseDirectory, record.foldername, "metadata.xml"))
+        os.rmdir(os.path.join(record.baseDirectory, record.foldername))
 
 
 def suite():
