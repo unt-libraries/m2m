@@ -16,6 +16,7 @@ def xml_to_pretty_string(xml):
     s = etree.tostring(xml, pretty_print=True)
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + s
 
+
 class CSVToDictTests(unittest.TestCase):
     def test_csv_to_dict(self):
         csv_list = m2m.CSVToDict('tests/data/test.csv')
@@ -317,44 +318,49 @@ class MetadataRecordTests(unittest.TestCase):
         record.writeTemplateFiles(record.baseDirectory, record.foldername)
 
         self.assertTrue(os.path.exists(record.baseDirectory))
-        self.assertTrue(os.path.exists(os.path.join(record.baseDirectory, record.foldername)))
-        self.assertTrue(os.path.exists(os.path.join(record.baseDirectory, record.foldername, "metadata.xml")))
+        self.assertTrue(os.path.exists(os.path.join(
+                                       record.baseDirectory, record.foldername)))
+        self.assertTrue(os.path.exists(os.path.join(
+                                       record.baseDirectory, record.foldername, "metadata.xml")))
 
         self.pub_tree.publisher.name = 'UNT Libraries'
         self.pub_tree.publisher.location = 'Denton, Texas'
         self.pub_tree.meta = 'mphillips'
         self.pub_tree.meta.set('qualifier', 'metadataCreator')
 
-        filename = os.path.join(record.baseDirectory, record.foldername, "metadata.xml")
+        filename = os.path.join(record.baseDirectory, record.foldername, 'metadata.xml')
         record_from_file = open(filename).read()
 
         self.assertEqual(record_from_file, xml_to_pretty_string(self.pub_tree))
 
-        # remove test files that were written 
-        os.remove(os.path.join(record.baseDirectory, record.foldername, "metadata.xml"))
+        # remove test files that were written
+        os.remove(os.path.join(record.baseDirectory, record.foldername, 'metadata.xml'))
         os.rmdir(os.path.join(record.baseDirectory, record.foldername))
 
     def test_write_json_metadata_file(self):
         record = m2m.MetadataRecord('mphillips')
-        
+
         record.setBaseDirectory('tests')
         record.setFolderName('test_data')
-        test_json_data = {"test": "data"}
+        test_json_data = {'test': 'data'}
 
         record.writeJSONFile(record.baseDirectory, record.foldername, test_json_data)
 
         self.assertTrue(os.path.exists(record.baseDirectory))
-        self.assertTrue(os.path.exists(os.path.join(record.baseDirectory, record.foldername)))
-        self.assertTrue(os.path.exists(os.path.join(record.baseDirectory, record.foldername, "metadata.json")))
-        
-        filename = os.path.join(record.baseDirectory, record.foldername, "metadata.json")
+        self.assertTrue(os.path.exists(os.path.join(
+                                       record.baseDirectory, record.foldername)))
+        self.assertTrue(os.path.exists(os.path.join(
+                                       record.baseDirectory, record.foldername, 'metadata.json')))
+
+        filename = os.path.join(record.baseDirectory, record.foldername, 'metadata.json')
         record_from_file = open(filename).read()
 
         self.assertEqual(json.loads(record_from_file), test_json_data)
-        
-        # remove test files that were written 
-        os.remove(os.path.join(record.baseDirectory, record.foldername, "metadata.json"))
+
+        # remove test files that were written
+        os.remove(os.path.join(record.baseDirectory, record.foldername, 'metadata.json'))
         os.rmdir(os.path.join(record.baseDirectory, record.foldername))
+
 
 def suite():
     alltests = unittest.TestSuite()
