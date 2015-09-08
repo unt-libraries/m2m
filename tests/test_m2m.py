@@ -78,7 +78,7 @@ class MetadataRecordTests(unittest.TestCase):
         s = etree.fromstring(str(record))
         self.assertEquals(len(s.findall('meta[@qualifier="metadataCreationDate"]')), 1)
 
-        date_string_regex = re.compile('\d\d\d\d-\d\d-\d\d,\ \d\d:\d\d:\d\d')
+        date_string_regex = re.compile('\d\d\d\d-\d\d-\d\d, \d\d:\d\d:\d\d')
         meta_date_string = s.findall('meta[@qualifier="metadataCreationDate"]')[0].text
         self.assertTrue(date_string_regex.match(meta_date_string))
 
