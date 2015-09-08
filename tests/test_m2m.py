@@ -363,11 +363,11 @@ class MetadataRecordTests(unittest.TestCase):
 
 
 def suite():
-    alltests = unittest.TestSuite()
-    alltests.addTest(unittest.makeSuite(CSVToDictTests))
-    alltests.addTest(unittest.makeSuite(MetadataRecordTests))
+    all_tests = unittest.TestSuite()
+    all_tests.addTest(unittest.makeSuite(CSVToDictTests))
+    all_tests.addTest(unittest.makeSuite(MetadataRecordTests))
 
-    return alltests
+    return all_tests
 
 if __name__ == '__main__':
     unittest.main()
