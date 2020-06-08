@@ -1,1 +1,1 @@
-pyuntl
+git+https://github.com/unt-libraries/pyuntl.git@master#egg=pyuntl
