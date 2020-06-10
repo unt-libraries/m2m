@@ -86,14 +86,14 @@ class MetadataRecordTests(unittest.TestCase):
         # if element value is None then it should return None.
 
         record = m2m.MetadataRecord('mphillips')
-        self.assertEqual(record.get_mapping('basic', 'title', None), None)
+        self.assertEqual(record.mapping('basic', 'title', None), None)
 
     def test_empty_element_value_equals_none(self):
         # if element value is empty for non-required elements
         # then map should return None.
 
         record = m2m.MetadataRecord('mphillips')
-        self.assertEqual(record.get_mapping('basic', 'title', '', required=False),
+        self.assertEqual(record.mapping('basic', 'title', '', required=False),
                           None)
 
     def test_set_base_directory(self):
@@ -113,7 +113,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.get_mapping('basic', 'author', 'text')
+            record.mapping('basic', 'author', 'text')
 
         expected_error = 'Element named "author" not in fieldTypes'
         self.assertEqual(str(cm.exception), expected_error)
@@ -123,7 +123,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.get_mapping('simple', 'title', 'text')
+            record.mapping('simple', 'title', 'text')
 
         expected_error = 'Unsupported mapping function type, simple'
         self.assertEqual(str(cm.exception), expected_error)
@@ -133,7 +133,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.get_mapping('basic', 'title', '')
+            record.mapping('basic', 'title', '')
 
         expected_error = 'Value required for element named "title"'
         self.assertEqual(str(cm.exception), expected_error)
@@ -143,7 +143,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.get_mapping('agent', 'title', 'test')
+            record.mapping('agent', 'title', 'test')
 
         expected_error = 'Element "title" should be of basic type, but you' \
                          ' are attempting to add it as "agent" type.'
@@ -151,7 +151,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_split_function_of_map(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'm|f', split='|')
+        record.mapping('basic', 'title', 'm|f', split='|')
 
         self.tree.title = ['m', 'f']
         self.tree.meta = 'mphillips'
@@ -161,7 +161,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_empty_split_function_of_map(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'm|f', split='')
+        record.mapping('basic', 'title', 'm|f', split='')
 
         self.tree.title = 'm|f'
         self.tree.meta = 'mphillips'
@@ -171,7 +171,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_basic_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'test_title')
+        record.mapping('basic', 'title', 'test_title')
 
         self.tree.title = 'test_title'
         self.tree.meta = 'mphillips'
@@ -181,7 +181,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_basic_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'test_title', qualifier='officialtitle')
+        record.mapping('basic', 'title', 'test_title', qualifier='officialtitle')
 
         self.tree.title = 'test_title'
         self.tree.title.set('qualifier', 'officialtitle')
@@ -192,7 +192,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_basic_map_empty_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'test_title', qualifier='')
+        record.mapping('basic', 'title', 'test_title', qualifier='')
 
         self.tree.title = 'test_title'
         self.tree.meta = 'mphillips'
@@ -202,7 +202,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_basic_map_qualified_basic_with_function(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('basic', 'title', 'test_title',
+        record.mapping('basic', 'title', 'test_title',
                    qualifier='officialtitle',
                    function=(lambda x: x.upper())
                    )
@@ -216,7 +216,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'creator', 'Phillips, Mark')
+        record.mapping('agent', 'creator', 'Phillips, Mark')
 
         self.agent_tree.creator.name = 'Phillips, Mark'
         del self.agent_tree.creator.info
@@ -228,7 +228,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_qualified_with_function(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut',
                    function=(lambda x: x.upper())
                    )
@@ -244,7 +244,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'creator', 'Phillips, Mark', qualifier='aut')
+        record.mapping('agent', 'creator', 'Phillips, Mark', qualifier='aut')
 
         self.agent_tree.creator.name = 'Phillips, Mark'
         del self.agent_tree.creator.info
@@ -257,7 +257,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_qualified_info_only(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut', info='First Publication')
 
         self.agent_tree.creator.info = 'First Publication'
@@ -272,7 +272,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_qualified_info_and_agent_type(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut',
                    info='First Publication',
                    agent_type='per')
@@ -288,7 +288,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_agent_map_qualified_with_location(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'publisher', 'UNT Libraries',
+        record.mapping('agent', 'publisher', 'UNT Libraries',
                    location='Denton, Texas')
 
         self.pub_tree.publisher.name = 'UNT Libraries'
@@ -303,7 +303,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.get_mapping('agent', 'creator', 'Phillips, Mark',
+            record.mapping('agent', 'creator', 'Phillips, Mark',
                        location='aut')
 
         expected_error = 'location can only be used on publisher element'
@@ -311,7 +311,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_write_xml_metadata_file(self):
         record = m2m.MetadataRecord('mphillips')
-        record.get_mapping('agent', 'publisher', 'UNT Libraries',
+        record.mapping('agent', 'publisher', 'UNT Libraries',
                    location='Denton, Texas')
         record.setBaseDirectory('tests')
         record.setFolderName('test_data')

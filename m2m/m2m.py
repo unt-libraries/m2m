@@ -52,9 +52,9 @@ class MetadataRecord(object):
     def __init__(self, metadataCreator, addDate=False):
         # create our initial tree
         self.root_element = PYUNTL_DISPATCH['metadata']()
-        self.get_mapping("basic", "meta", metadataCreator, qualifier="metadataCreator")
+        self.mapping("basic", "meta", metadataCreator, qualifier="metadataCreator")
         if addDate is True:
-            self.get_mapping("basic", "meta", "%s" % time.strftime(
+            self.mapping("basic", "meta", "%s" % time.strftime(
                      "%Y-%m-%d, %H:%M:%S"), qualifier="metadataCreationDate")
 
     def __bytes__(self):
@@ -66,7 +66,7 @@ class MetadataRecord(object):
     def setFolderName(self, FolderName):
         self.foldername = FolderName
 
-    def get_mapping(self, elementType, elementName, elementValue, qualifier=None,
+    def mapping(self, elementType, elementName, elementValue, qualifier=None,
             required=True, info="", location="", agent_type="", split="",
             function=None):
         """
