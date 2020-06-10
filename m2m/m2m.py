@@ -37,10 +37,7 @@ fieldTypes = {
 
 def CSVToDict(csvFileName):
     readerDict = csv.DictReader(open(csvFileName))
-    readerList = []
-    for d in readerDict:
-        readerList.append(d)
-    return readerList
+    return list(readerDict)
 
 
 class MetadataConverterException(Exception):
@@ -73,7 +70,7 @@ class MetadataRecord(object):
         Mapping Function
         """
 
-        if elementType is not "basic" and elementType is not "agent":
+        if elementType not in {"basic", "agent"}:
             raise MetadataConverterException(
                 "Unsupported mapping function type, %s" % elementType)
 
@@ -155,10 +152,8 @@ class MetadataRecord(object):
                     "Unable to create the output directory '%s'. " +
                     "Perhaps you should check permissions?" %
                     (writeDirectory,))
-        templateFile = open(os.path.join(writeDirectory, "metadata.xml"), "wb")
-        xmlFile = self.__bytes__()
-        templateFile.write(xmlFile)
-        templateFile.close()
+        with open(os.path.join(writeDirectory, "metadata.xml"), "wb") as templateFile:
+            templateFile.write(self.__bytes__())
         return "%s finished" % foldername
 
     def writeJSONFile(self, baseDirectory, foldername, data):

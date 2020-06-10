@@ -4,11 +4,11 @@ m2m is a python package and command line tool to assist in converting csv docume
 ```python
 >>> from m2m import m2m
 >>> record = m2m.MetadataRecord("mphillips")
->>> record.map("basic", "title", "Pawn of Prophecy", qualifier="officialtitle")
->>> record.map("agent", "creator", "Eddings, David", qualifier="aut", agent_type="per")
->>> record.map("basic", "date", "1982", qualifier="creation")
->>> print record
-<?xml version="1.0" encoding="UTF-8"?>
+>>> record.mapping("basic", "title", "Pawn of Prophecy", qualifier="officialtitle")
+>>> record.mapping("agent", "creator", "Eddings, David", qualifier="aut", agent_type="per")
+>>> record.mapping("basic", "date", "1982", qualifier="creation")
+>>> print(bytes(record))
+b'''<?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <title qualifier="officialtitle">Pawn of Prophecy</title>
   <creator qualifier="aut">
@@ -17,7 +17,7 @@ m2m is a python package and command line tool to assist in converting csv docume
   </creator>
   <date qualifier="creation">1982</date>
   <meta qualifier="metadataCreator">mphillips</meta>
-</metadata>
+</metadata>'''
 ```
 
 # License
