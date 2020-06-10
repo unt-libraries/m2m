@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='m2m',
-    version='1.0.0',
+    version='2.0.0',
     url='https://github.com/unt-libraries/m2m',
     author='Mark Phillips',
     author_email='mark.phillips@unt.edu',
@@ -19,7 +19,10 @@ setup(
         'Intended Audience :: Developers'
         'Intended Audience :: Information Technology'
         'License :: OSI Approved :: BSD License'
-        'Programming Language :: Python'
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     test_suite='tests',
 )
