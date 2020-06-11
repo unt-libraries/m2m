@@ -20,7 +20,7 @@ m2m is a python package and command line tool to assist in converting csv docume
 </metadata>
 ```
 
-Requiremnets
+Requirements
 ------------
 
 * Python 3.6 - 3.8
@@ -28,7 +28,7 @@ Requiremnets
 Installation
 --------------
 
-This application can be installed by following the steps below:
+This application can be installed and run by following the steps below:
 
     $ git clone https://github.com/unt-libraries/m2m.git
 
