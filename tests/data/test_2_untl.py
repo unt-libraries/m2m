@@ -11,4 +11,7 @@ def processRecord(RecordClass, row):
     record.mapping('basic', 'date', row['date'],
                     qualifier='creation', required=False)
 
+    record.setBaseDirectory('records')
+    record.setFolderName(row['isbn'])
+   
     return record
