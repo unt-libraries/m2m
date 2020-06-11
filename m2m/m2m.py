@@ -57,6 +57,9 @@ class MetadataRecord(object):
     def __bytes__(self):
         return untlpydict2xmlstring(untlpy2dict(self.root_element))
 
+    def __str__(self):
+        return self.__bytes__().decode()
+
     def setBaseDirectory(self, BaseDirectory):
         self.baseDirectory = BaseDirectory
 
