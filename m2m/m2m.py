@@ -73,7 +73,7 @@ class MetadataRecord(object):
         Mapping Function
         """
 
-        if elementType not in {"basic", "agent"}:
+        if elementType not in ("basic", "agent"):
             raise MetadataConverterException(
                 "Unsupported mapping function type, %s" % elementType)
 
