@@ -2,6 +2,8 @@
 
 from setuptools import setup
 
+pyuntl_url = 'git+https://github.com/unt-libraries/pyuntl.git@master#egg=pyuntl'
+
 setup(
     name='m2m',
     version='2.0.0',
@@ -11,10 +13,8 @@ setup(
     license='BSD',
     packages=['m2m'],
     scripts=['m2m/m2m.py'],
-    install_requires=['pyuntl'],
-    dependency_links=[
-        'git+https://github.com/unt-libraries/pyuntl.git/@master#egg=pyuntl-2.0.0'
-    ],
+    install_requires=['pyuntl @' + pyuntl_url],
+    dependency_links=[pyuntl_url],
     description='Package and command line tool for mapping csv files to UNTL metadata records.',
     long_description='See the home page for more information.',
     classifiers=[

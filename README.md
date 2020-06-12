@@ -28,13 +28,15 @@ Requirements
 Installation
 --------------
 
-This application can be installed and run by following the steps below:
+This application can be installed by following the steps below:
 
     $ git clone https://github.com/unt-libraries/m2m.git
 
     $ cd m2m
 
-    $ python setup.py install
+    $ pip install .
+
+This application can be run using following command with example files.
 
     $ python m2m/m2m.py tests/data/test.csv -m tests/data/test_2_untl.py
 
