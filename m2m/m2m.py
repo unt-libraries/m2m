@@ -10,28 +10,28 @@ from pyuntl.untldoc import untlpydict2xmlstring, untlpy2dict
 
 
 fieldTypes = {
-    "title": "basic",
-    "creator": "agent",
-    "contributor": "agent",
-    "publisher": "agent",
-    "date": "basic",
-    "language": "basic",
-    "description": "basic",
-    "subject": "basic",
-    "coverage": "basic",
-    "source": "basic",
-    "relation": "basic",
-    "collection": "basic",
-    "institution": "basic",
-    "rights": "basic",
-    "resourceType": "basic",
-    "format": "basic",
-    "identifier": "basic",
-    "note": "basic",
-    "degree": "basic",
-    "meta": "basic",
-    "primarySource": "basic",
-    "citation": "basic",
+    'title': 'basic',
+    'creator': 'agent',
+    'contributor': 'agent',
+    'publisher': 'agent',
+    'date': 'basic',
+    'language': 'basic',
+    'description': 'basic',
+    'subject': 'basic',
+    'coverage': 'basic',
+    'source': 'basic',
+    'relation': 'basic',
+    'collection': 'basic',
+    'institution': 'basic',
+    'rights': 'basic',
+    'resourceType': 'basic',
+    'format': 'basic',
+    'identifier': 'basic',
+    'note': 'basic',
+    'degree': 'basic',
+    'meta': 'basic',
+    'primarySource': 'basic',
+    'citation': 'basic',
     }
 
 
@@ -44,15 +44,16 @@ class MetadataConverterException(Exception):
     """Base class for exceptions in this package"""
     pass
 
+
 class MetadataRecord(object):
 
     def __init__(self, metadataCreator, addDate=False):
         # create our initial tree
         self.root_element = PYUNTL_DISPATCH['metadata']()
-        self.mapping("basic", "meta", metadataCreator, qualifier="metadataCreator")
+        self.mapping('basic', 'meta', metadataCreator, qualifier='metadataCreator')
         if addDate is True:
-            self.mapping("basic", "meta", "%s" % time.strftime(
-                     "%Y-%m-%d, %H:%M:%S"), qualifier="metadataCreationDate")
+            self.mapping('basic', 'meta', '%s' % time.strftime(
+                     '%Y-%m-%d, %H:%M:%S'), qualifier='metadataCreationDate')
 
     def __bytes__(self):
         return untlpydict2xmlstring(untlpy2dict(self.root_element))
@@ -67,15 +68,15 @@ class MetadataRecord(object):
         self.foldername = FolderName
 
     def mapping(self, elementType, elementName, elementValue, qualifier=None,
-            required=True, info="", location="", agent_type="", split="",
-            function=None):
+                required=True, info='', location='', agent_type='', split='',
+                function=None):
         """
         Mapping Function
         """
 
-        if elementType not in ("basic", "agent"):
+        if elementType not in ('basic', 'agent'):
             raise MetadataConverterException(
-                "Unsupported mapping function type, %s" % elementType)
+                'Unsupported mapping function type, %s' % elementType)
 
         # strip whitespace
         if elementValue is None:
@@ -85,58 +86,58 @@ class MetadataRecord(object):
 
         # test if the value is present if required
         if required is True:
-            if strippedValue == "":
+            if strippedValue == '':
                 raise MetadataConverterException(
-                    'Value required for element named "%s"' % elementName)
+                    'Value required for element named %s' % elementName)
 
         # if there isn't value don't continue
-        if strippedValue == "":
+        if strippedValue == '':
             return None
 
         if elementName not in fieldTypes:
             raise MetadataConverterException(
-                'Element named "%s" not in fieldTypes' % elementName)
+                'Element named %s not in fieldTypes' % elementName)
 
         if fieldTypes[elementName] != elementType:
             raise MetadataConverterException(
-                    'Element "%s" should be of %s type, but you are attempting to add it as "%s" type.' % (elementName, fieldTypes[elementName], elementType))
+                    'Element %s should be of %s type, but you are attempting to add it as %s type.'
+                    % (elementName, fieldTypes[elementName], elementType))
 
-        if location.strip() != "" and elementName != "publisher":
-            raise MetadataConverterException("location can only be used on" +
-                                             " publisher element")
+        if location.strip() != '' and elementName != 'publisher':
+            raise MetadataConverterException('location can only be used on publisher element')
         # If split is set then split on the split pattern,
         # creating an element for each
 
-        if split.strip() != "":
+        if split.strip() != '':
             valueList = [elem.strip() for elem in strippedValue.split(split)]
         else:
             valueList = [strippedValue]
 
-        if "basic" == elementType:
+        if elementType == 'basic':
             for value in valueList:
                 if function:
                     value = function(value)
                 sub = PYUNTL_DISPATCH[elementName]()
-                if qualifier and qualifier.strip() != "":
+                if qualifier and qualifier.strip() != '':
                     sub.set_qualifier(qualifier)
                 sub.set_content(value)
                 self.root_element.add_child(sub)
-        elif "agent" == elementType:
+        elif elementType == 'agent':
             for value in valueList:
                 if function:
                     value = function(value)
                 agent = PYUNTL_DISPATCH[elementName]()
-                if qualifier and qualifier.strip() != "":
+                if qualifier and qualifier.strip() != '':
                     agent.set_qualifier(qualifier)
                 agent.add_child(
                     PYUNTL_DISPATCH['name'](content=value))
-                if info.strip() != "":
+                if info.strip() != '':
                     agent.add_child(
                         PYUNTL_DISPATCH['info'](content=info.strip()))
-                if location.strip() != "":
+                if location.strip() != '':
                     agent.add_child(
                         PYUNTL_DISPATCH['location'](content=location.strip()))
-                if agent_type.strip() != "":
+                if agent_type.strip() != '':
                     agent.add_child(
                         PYUNTL_DISPATCH['type'](content=agent_type.strip()))
                 self.root_element.add_child(agent)
@@ -147,17 +148,17 @@ class MetadataRecord(object):
         writeDirectory = os.path.join(baseDirectory, foldername)
         try:
             os.makedirs(writeDirectory)
-        except:
+        except OSError:
             if os.path.exists(writeDirectory):
                 pass  # no big deal if they exist
             else:
                 raise MetadataConverterException(
-                    "Unable to create the output directory '%s'. " +
-                    "Perhaps you should check permissions?" %
-                    (writeDirectory,))
-        with open(os.path.join(writeDirectory, "metadata.xml"), "wb") as templateFile:
+                    'Unable to create the output directory %s. ' +
+                    'Perhaps you should check permissions?' %
+                    writeDirectory)
+        with open(os.path.join(writeDirectory, 'metadata.xml'), 'wb') as templateFile:
             templateFile.write(self.__bytes__())
-        return "%s finished" % foldername
+        return '%s finished' % foldername
 
     def writeJSONFile(self, baseDirectory, foldername, data):
         baseDirectory = baseDirectory
@@ -165,15 +166,14 @@ class MetadataRecord(object):
         writeDirectory = os.path.join(baseDirectory, foldername)
         try:
             os.makedirs(writeDirectory)
-        except:
+        except OSError:
             if os.path.exists(writeDirectory):
                 pass  # no big deal if they exist
             else:
                 raise MetadataConverterException(
-                    "Unable to create the output directory '%s'. " +
-                    "Perhaps you should check permissions?" %
-                    (writeDirectory,))
-        jsonFilename = open(os.path.join(writeDirectory, "metadata.json"), "w")
+                    'Unable to create the output directory %s.'
+                    'Perhaps you should check permissions?' % writeDirectory)
+        jsonFilename = open(os.path.join(writeDirectory, 'metadata.json'), 'w')
         jsonFile = json.dumps(data,
                               sort_keys=True,
                               indent=4,
@@ -181,41 +181,41 @@ class MetadataRecord(object):
                               )
         jsonFilename.write(jsonFile)
         jsonFilename.close()
-        return "%s finished JSON" % foldername
+        return '%s finished JSON' % foldername
 
 
-if "__main__" == __name__:
+if '__main__' == __name__:
 
-    usage = "usage: %prog [options] <csv file>"
+    usage = 'usage: %prog [options] <csv file>'
 
     parser = OptionParser(usage=usage)
 
-    parser.add_option("-m", "--mapping", action="store", type="string",
-                      dest="mapping",
-                      help="Specify the mapping file to use for this CSV")
+    parser.add_option('-m', '--mapping', action='store', type='string',
+                      dest='mapping',
+                      help='Specify the mapping file to use for this CSV')
 
-    parser.add_option("-n", "--row", action="store", type="int",
-                      dest="row",
-                      help="Specify a single row number to process")
+    parser.add_option('-n', '--row', action='store', type='int',
+                      dest='row',
+                      help='Specify a single row number to process')
 
-    parser.add_option("-w", "--write", action="store_true",
-                      dest="write",
-                      help="Write records to files")
+    parser.add_option('-w', '--write', action='store_true',
+                      dest='write',
+                      help='Write records to files')
 
-    parser.add_option("-j", "--json",
-                      action="store_true",
-                      dest="json",
-                      help="UWrite json version of metadata")
+    parser.add_option('-j', '--json',
+                      action='store_true',
+                      dest='json',
+                      help='UWrite json version of metadata')
 
     (options, args) = parser.parse_args()
 
     if not options.mapping:
-        parser.error("You must supply a mapping file.")
+        parser.error('You must supply a mapping file.')
 
     if not len(args):
-        parser.error("You must supply a CSV file to process.")
+        parser.error('You must supply a CSV file to process.')
 
-    print("Processing CSV file %s with mapping %s" % (args[0], options.mapping))
+    print('Processing CSV file %s with mapping %s' % (args[0], options.mapping))
 
     mappingPath = os.path.abspath(options.mapping)
     CSVPath = os.path.abspath(args[0])
@@ -226,26 +226,26 @@ if "__main__" == __name__:
 
     exec(compile(open(mappingPath).read(), mappingPath, 'exec'), {}, localDict)
 
-    mappingFunction = localDict["processRecord"]
+    mappingFunction = localDict['processRecord']
 
     if options.row:
         try:
             CSVRows = [CSVRows[options.row - 1]]
         except IndexError:
-            print("Sorry, %s is not a valid row number." % (options.row))
+            print('Sorry, %s is not a valid row number.' % options.row)
             sys.exit(1)
     for x in range(len(CSVRows)):
         row = CSVRows[x]
 
         if options.write:
-            print("Writing record for row %s" % x)
+            print('Writing record for row %s' % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeTemplateFiles(record.baseDirectory, record.foldername)
         if options.json:
-            print("Writing json record for row %s" % x)
+            print('Writing json record for row %s' % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeJSONFile(record.baseDirectory, record.foldername, row)
         else:
-            print("Processing row %s" % x)
+            print('Processing row %s' % x)
             record = mappingFunction(MetadataRecord, row)
             print(record)
