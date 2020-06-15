@@ -9,7 +9,6 @@ matrix:
           env: TOXENV=py38
 # command to install dependencies
 install:
-  - pip install --upgrade pip
   - pip install tox
 # command to run tests
 script:
