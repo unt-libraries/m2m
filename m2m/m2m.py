@@ -37,15 +37,7 @@ fieldTypes = {
 
 def CSVToDict(csvFileName):
     readerDict = csv.DictReader(open(csvFileName))
-    readerList = []
-    for d in readerDict:
-        for k, v in d.items():
-            try:
-                d[k] = unicode(v, 'utf-8', 'replace')  # probably not smart
-            except:
-                pass  # not sure how smart /this/ is either...
-        readerList.append(d)
-    return readerList
+    return list(readerDict)
 
 
 class MetadataConverterException(Exception):
@@ -57,13 +49,16 @@ class MetadataRecord(object):
     def __init__(self, metadataCreator, addDate=False):
         # create our initial tree
         self.root_element = PYUNTL_DISPATCH['metadata']()
-        self.map("basic", "meta", metadataCreator, qualifier="metadataCreator")
+        self.mapping("basic", "meta", metadataCreator, qualifier="metadataCreator")
         if addDate is True:
-            self.map("basic", "meta", "%s" % time.strftime(
+            self.mapping("basic", "meta", "%s" % time.strftime(
                      "%Y-%m-%d, %H:%M:%S"), qualifier="metadataCreationDate")
 
-    def __str__(self):
+    def __bytes__(self):
         return untlpydict2xmlstring(untlpy2dict(self.root_element))
+
+    def __str__(self):
+        return self.__bytes__().decode()
 
     def setBaseDirectory(self, BaseDirectory):
         self.baseDirectory = BaseDirectory
@@ -71,14 +66,14 @@ class MetadataRecord(object):
     def setFolderName(self, FolderName):
         self.foldername = FolderName
 
-    def map(self, elementType, elementName, elementValue, qualifier=None,
+    def mapping(self, elementType, elementName, elementValue, qualifier=None,
             required=True, info="", location="", agent_type="", split="",
             function=None):
         """
         Mapping Function
         """
 
-        if elementType is not "basic" and elementType is not "agent":
+        if elementType not in ("basic", "agent"):
             raise MetadataConverterException(
                 "Unsupported mapping function type, %s" % elementType)
 
@@ -160,10 +155,8 @@ class MetadataRecord(object):
                     "Unable to create the output directory '%s'. " +
                     "Perhaps you should check permissions?" %
                     (writeDirectory,))
-        templateFile = open(os.path.join(writeDirectory, "metadata.xml"), "w")
-        xmlFile = self.__str__()
-        templateFile.write(xmlFile)
-        templateFile.close()
+        with open(os.path.join(writeDirectory, "metadata.xml"), "wb") as templateFile:
+            templateFile.write(self.__bytes__())
         return "%s finished" % foldername
 
     def writeJSONFile(self, baseDirectory, foldername, data):
@@ -222,7 +215,7 @@ if "__main__" == __name__:
     if not len(args):
         parser.error("You must supply a CSV file to process.")
 
-    print "Processing CSV file %s with mapping %s" % (args[0], options.mapping)
+    print("Processing CSV file %s with mapping %s" % (args[0], options.mapping))
 
     mappingPath = os.path.abspath(options.mapping)
     CSVPath = os.path.abspath(args[0])
@@ -231,7 +224,7 @@ if "__main__" == __name__:
 
     localDict = {}
 
-    execfile(mappingPath, {}, localDict)
+    exec(compile(open(mappingPath).read(), mappingPath, 'exec'), {}, localDict)
 
     mappingFunction = localDict["processRecord"]
 
@@ -239,20 +232,20 @@ if "__main__" == __name__:
         try:
             CSVRows = [CSVRows[options.row - 1]]
         except IndexError:
-            print "Sorry, %s is not a valid row number." % (options.row)
+            print("Sorry, %s is not a valid row number." % (options.row))
             sys.exit(1)
     for x in range(len(CSVRows)):
         row = CSVRows[x]
 
         if options.write:
-            print "Writing record for row %s" % x
+            print("Writing record for row %s" % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeTemplateFiles(record.baseDirectory, record.foldername)
         if options.json:
-            print "Writing json record for row %s" % x
+            print("Writing json record for row %s" % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeJSONFile(record.baseDirectory, record.foldername, row)
         else:
-            print "Processing row %s" % x
+            print("Processing row %s" % x)
             record = mappingFunction(MetadataRecord, row)
             print(record)

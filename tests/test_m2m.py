@@ -14,20 +14,20 @@ def xml_to_pretty_string(xml):
     etree.cleanup_namespaces(xml)
 
     s = etree.tostring(xml, pretty_print=True)
-    return '<?xml version="1.0" encoding="UTF-8"?>\n' + s
+    return b'<?xml version="1.0" encoding="UTF-8"?>\n' + s
 
 
 class CSVToDictTests(unittest.TestCase):
     def test_csv_to_dict(self):
         csv_list = m2m.CSVToDict('tests/data/test.csv')
         self.assertIsInstance(csv_list, list)
-        self.assertEquals(len(csv_list), 1)
+        self.assertEqual(len(csv_list), 1)
 
 
 class MetadataRecordTests(unittest.TestCase):
 
     def setUp(self):
-        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        xml = b"""<?xml version="1.0" encoding="UTF-8"?>
             <metadata>
                 <title />
                 <meta qualifier='metadataCreator'></meta>
@@ -35,19 +35,19 @@ class MetadataRecordTests(unittest.TestCase):
         """
         self.tree = objectify.fromstring(xml)
 
-        agent_xml = """<?xml version="1.0" encoding="UTF-8"?>
+        agent_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
             <metadata>
                 <creator>
+                    <name />
                     <info />
                     <type />
-                    <name />
                 </creator>
                 <meta />
             </metadata>
         """
         self.agent_tree = objectify.fromstring(agent_xml)
 
-        pub_xml = """<?xml version="1.0" encoding="UTF-8"?>
+        pub_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
             <metadata>
                 <publisher>
                     <name />
@@ -64,21 +64,21 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
         self.assertIsInstance(record, m2m.MetadataRecord)
 
-        s = etree.fromstring(str(record))
-        self.assertEquals(len(s.findall('meta[@qualifier="metadataCreator"]')), 1)
+        s = etree.fromstring(bytes(record))
+        self.assertEqual(len(s.findall('meta[@qualifier="metadataCreator"]')), 1)
 
         creator_string = s.findall('meta[@qualifier="metadataCreator"]')[0].text
-        self.assertEquals(creator_string, 'mphillips')
+        self.assertEqual(creator_string, 'mphillips')
 
     def test_metadata_record_setup_with_date(self):
 
         record = m2m.MetadataRecord('mphillips', addDate=True)
         self.assertIsInstance(record, m2m.MetadataRecord)
 
-        s = etree.fromstring(str(record))
-        self.assertEquals(len(s.findall('meta[@qualifier="metadataCreationDate"]')), 1)
+        s = etree.fromstring(bytes(record))
+        self.assertEqual(len(s.findall('meta[@qualifier="metadataCreationDate"]')), 1)
 
-        date_string_regex = re.compile('\d\d\d\d-\d\d-\d\d, \d\d:\d\d:\d\d')
+        date_string_regex = re.compile(r'\d\d\d\d-\d\d-\d\d, \d\d:\d\d:\d\d')
         meta_date_string = s.findall('meta[@qualifier="metadataCreationDate"]')[0].text
         self.assertTrue(date_string_regex.match(meta_date_string))
 
@@ -86,34 +86,34 @@ class MetadataRecordTests(unittest.TestCase):
         # if element value is None then it should return None.
 
         record = m2m.MetadataRecord('mphillips')
-        self.assertEquals(record.map('basic', 'title', None), None)
+        self.assertEqual(record.mapping('basic', 'title', None), None)
 
     def test_empty_element_value_equals_none(self):
         # if element value is empty for non-required elements
         # then map should return None.
 
         record = m2m.MetadataRecord('mphillips')
-        self.assertEquals(record.map('basic', 'title', '', required=False),
+        self.assertEqual(record.mapping('basic', 'title', '', required=False),
                           None)
 
     def test_set_base_directory(self):
 
         record = m2m.MetadataRecord('mphillips')
         record.setBaseDirectory('out')
-        self.assertEquals(record.baseDirectory, 'out')
+        self.assertEqual(record.baseDirectory, 'out')
 
     def test_set_folder_name(self):
 
         record = m2m.MetadataRecord('mphillips')
         record.setFolderName('folder')
-        self.assertEquals(record.foldername, 'folder')
+        self.assertEqual(record.foldername, 'folder')
 
     def test_element_not_in_field_type(self):
 
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.map('basic', 'author', 'text')
+            record.mapping('basic', 'author', 'text')
 
         expected_error = 'Element named "author" not in fieldTypes'
         self.assertEqual(str(cm.exception), expected_error)
@@ -123,7 +123,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.map('simple', 'title', 'text')
+            record.mapping('simple', 'title', 'text')
 
         expected_error = 'Unsupported mapping function type, simple'
         self.assertEqual(str(cm.exception), expected_error)
@@ -133,7 +133,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.map('basic', 'title', '')
+            record.mapping('basic', 'title', '')
 
         expected_error = 'Value required for element named "title"'
         self.assertEqual(str(cm.exception), expected_error)
@@ -143,7 +143,7 @@ class MetadataRecordTests(unittest.TestCase):
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.map('agent', 'title', 'test')
+            record.mapping('agent', 'title', 'test')
 
         expected_error = 'Element "title" should be of basic type, but you' \
                          ' are attempting to add it as "agent" type.'
@@ -151,58 +151,58 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_split_function_of_map(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'm|f', split='|')
+        record.mapping('basic', 'title', 'm|f', split='|')
 
         self.tree.title = ['m', 'f']
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_empty_split_function_of_map(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'm|f', split='')
+        record.mapping('basic', 'title', 'm|f', split='')
 
         self.tree.title = 'm|f'
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_basic_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'test_title')
+        record.mapping('basic', 'title', 'test_title')
 
         self.tree.title = 'test_title'
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_basic_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'test_title', qualifier='officialtitle')
+        record.mapping('basic', 'title', 'test_title', qualifier='officialtitle')
 
         self.tree.title = 'test_title'
         self.tree.title.set('qualifier', 'officialtitle')
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_basic_map_empty_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'test_title', qualifier='')
+        record.mapping('basic', 'title', 'test_title', qualifier='')
 
         self.tree.title = 'test_title'
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_basic_map_qualified_basic_with_function(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('basic', 'title', 'test_title',
+        record.mapping('basic', 'title', 'test_title',
                    qualifier='officialtitle',
                    function=(lambda x: x.upper())
                    )
@@ -212,11 +212,11 @@ class MetadataRecordTests(unittest.TestCase):
         self.tree.meta = 'mphillips'
         self.tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.tree))
 
     def test_agent_map_unqualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'creator', 'Phillips, Mark')
+        record.mapping('agent', 'creator', 'Phillips, Mark')
 
         self.agent_tree.creator.name = 'Phillips, Mark'
         del self.agent_tree.creator.info
@@ -224,11 +224,11 @@ class MetadataRecordTests(unittest.TestCase):
         self.agent_tree.meta = 'mphillips'
         self.agent_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
 
     def test_agent_map_qualified_with_function(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut',
                    function=(lambda x: x.upper())
                    )
@@ -240,11 +240,11 @@ class MetadataRecordTests(unittest.TestCase):
         self.agent_tree.meta = 'mphillips'
         self.agent_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
 
     def test_agent_map_qualified_no_options(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'creator', 'Phillips, Mark', qualifier='aut')
+        record.mapping('agent', 'creator', 'Phillips, Mark', qualifier='aut')
 
         self.agent_tree.creator.name = 'Phillips, Mark'
         del self.agent_tree.creator.info
@@ -253,11 +253,11 @@ class MetadataRecordTests(unittest.TestCase):
         self.agent_tree.meta = 'mphillips'
         self.agent_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
 
     def test_agent_map_qualified_info_only(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut', info='First Publication')
 
         self.agent_tree.creator.info = 'First Publication'
@@ -267,11 +267,12 @@ class MetadataRecordTests(unittest.TestCase):
         self.agent_tree.meta = 'mphillips'
         self.agent_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
+
 
     def test_agent_map_qualified_info_and_agent_type(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'creator', 'Phillips, Mark',
+        record.mapping('agent', 'creator', 'Phillips, Mark',
                    qualifier='aut',
                    info='First Publication',
                    agent_type='per')
@@ -283,11 +284,11 @@ class MetadataRecordTests(unittest.TestCase):
         self.agent_tree.meta = 'mphillips'
         self.agent_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.agent_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
 
     def test_agent_map_qualified_with_location(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'publisher', 'UNT Libraries',
+        record.mapping('agent', 'publisher', 'UNT Libraries',
                    location='Denton, Texas')
 
         self.pub_tree.publisher.name = 'UNT Libraries'
@@ -295,14 +296,14 @@ class MetadataRecordTests(unittest.TestCase):
         self.pub_tree.meta = 'mphillips'
         self.pub_tree.meta.set('qualifier', 'metadataCreator')
 
-        self.assertEqual(str(record), xml_to_pretty_string(self.pub_tree))
+        self.assertEqual(bytes(record), xml_to_pretty_string(self.pub_tree))
 
     def test_agent_incorrect_use_of_location_that_is_not_publisher(self):
 
         record = m2m.MetadataRecord('mphillips')
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
-            record.map('agent', 'creator', 'Phillips, Mark',
+            record.mapping('agent', 'creator', 'Phillips, Mark',
                        location='aut')
 
         expected_error = 'location can only be used on publisher element'
@@ -310,7 +311,7 @@ class MetadataRecordTests(unittest.TestCase):
 
     def test_write_xml_metadata_file(self):
         record = m2m.MetadataRecord('mphillips')
-        record.map('agent', 'publisher', 'UNT Libraries',
+        record.mapping('agent', 'publisher', 'UNT Libraries',
                    location='Denton, Texas')
         record.setBaseDirectory('tests')
         record.setFolderName('test_data')
@@ -329,8 +330,7 @@ class MetadataRecordTests(unittest.TestCase):
         self.pub_tree.meta.set('qualifier', 'metadataCreator')
 
         filename = os.path.join(record.baseDirectory, record.foldername, 'metadata.xml')
-        record_from_file = open(filename).read()
-
+        record_from_file = open(filename, 'rb').read()
         self.assertEqual(record_from_file, xml_to_pretty_string(self.pub_tree))
 
         # remove test files that were written
