@@ -88,7 +88,7 @@ class MetadataRecord(object):
         if required is True:
             if strippedValue == '':
                 raise MetadataConverterException(
-                    'Value required for element named %s' % elementName)
+                    'Value required for element named "%s"' % elementName)
 
         # if there isn't value don't continue
         if strippedValue == '':
@@ -96,7 +96,7 @@ class MetadataRecord(object):
 
         if elementName not in fieldTypes:
             raise MetadataConverterException(
-                'Element named %s not in fieldTypes' % elementName)
+                'Element named "%s" not in fieldTypes' % elementName)
 
         if fieldTypes[elementName] != elementType:
             raise MetadataConverterException(
@@ -171,20 +171,18 @@ class MetadataRecord(object):
                 pass  # no big deal if they exist
             else:
                 raise MetadataConverterException(
-                    'Unable to create the output directory %s.'
+                    'Unable to create the output directory %s. '
                     'Perhaps you should check permissions?' % writeDirectory)
-        jsonFilename = open(os.path.join(writeDirectory, 'metadata.json'), 'w')
-        jsonFile = json.dumps(data,
-                              sort_keys=True,
-                              indent=4,
-                              separators=(',', ': ')
-                              )
-        jsonFilename.write(jsonFile)
-        jsonFilename.close()
+        with open(os.path.join(writeDirectory, 'metadata.json'), 'w') as jsonFilename:
+            jsonFilename.write(json.dumps(data,
+                               sort_keys=True,
+                               indent=4,
+                               separators=(',', ': ')))
+
         return '%s finished JSON' % foldername
 
 
-if '__main__' == __name__:
+if __name__ == '__main__':
 
     usage = 'usage: %prog [options] <csv file>'
 

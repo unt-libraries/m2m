@@ -27,15 +27,15 @@ class CSVToDictTests(unittest.TestCase):
 class MetadataRecordTests(unittest.TestCase):
 
     def setUp(self):
-        xml = b'''<?xml version='1.0' encoding='UTF-8'?>
+        xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <title />
                 <meta qualifier='metadataCreator'></meta>
             </metadata>
-        '''
+        """
         self.tree = objectify.fromstring(xml)
 
-        agent_xml = b'''<?xml version='1.0' encoding='UTF-8'?>
+        agent_xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <creator>
                     <name />
@@ -44,10 +44,10 @@ class MetadataRecordTests(unittest.TestCase):
                 </creator>
                 <meta />
             </metadata>
-        '''
+        """
         self.agent_tree = objectify.fromstring(agent_xml)
 
-        pub_xml = b'''<?xml version='1.0' encoding='UTF-8'?>
+        pub_xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <publisher>
                     <name />
@@ -55,19 +55,19 @@ class MetadataRecordTests(unittest.TestCase):
                 </publisher>
                 <meta />
             </metadata>
-        '''
+        """
         self.pub_tree = objectify.fromstring(pub_xml)
 
     def test_metadata_record_setup(self):
-        """Tests that the creation of a record creates a MetadataRecord object."""
+        """Test that the creation of a record creates a MetadataRecord object."""
 
         record = m2m.MetadataRecord('mphillips')
         self.assertIsInstance(record, m2m.MetadataRecord)
 
         s = etree.fromstring(bytes(record))
-        self.assertEqual(len(s.findall("meta[@qualifier='metadataCreator']")), 1)
+        self.assertEqual(len(s.findall('meta[@qualifier="metadataCreator"]')), 1)
 
-        creator_string = s.findall("meta[@qualifier='metadataCreator']")[0].text
+        creator_string = s.findall('meta[@qualifier="metadataCreator"]')[0].text
         self.assertEqual(creator_string, 'mphillips')
 
     def test_metadata_record_setup_with_date(self):
@@ -76,10 +76,10 @@ class MetadataRecordTests(unittest.TestCase):
         self.assertIsInstance(record, m2m.MetadataRecord)
 
         s = etree.fromstring(bytes(record))
-        self.assertEqual(len(s.findall("meta[@qualifier='metadataCreationDate']")), 1)
+        self.assertEqual(len(s.findall('meta[@qualifier="metadataCreationDate"]')), 1)
 
         date_string_regex = re.compile(r'\d\d\d\d-\d\d-\d\d, \d\d:\d\d:\d\d')
-        meta_date_string = s.findall("meta[@qualifier='metadataCreationDate']")[0].text
+        meta_date_string = s.findall('meta[@qualifier="metadataCreationDate"]')[0].text
         self.assertTrue(date_string_regex.match(meta_date_string))
 
     def test_none_element_value_equals_none(self):
@@ -114,7 +114,7 @@ class MetadataRecordTests(unittest.TestCase):
         with self.assertRaises(m2m.MetadataConverterException) as cm:
             record.mapping('basic', 'author', 'text')
 
-        expected_error = 'Element named author not in fieldTypes'
+        expected_error = 'Element named "author" not in fieldTypes'
         self.assertEqual(str(cm.exception), expected_error)
 
     def test_unsupported_mapping_function_type(self):
@@ -134,7 +134,7 @@ class MetadataRecordTests(unittest.TestCase):
         with self.assertRaises(m2m.MetadataConverterException) as cm:
             record.mapping('basic', 'title', '')
 
-        expected_error = "Value required for element named title"
+        expected_error = 'Value required for element named "title"'
         self.assertEqual(str(cm.exception), expected_error)
 
     def test_incorrect_element_type_for_valid_element(self):
