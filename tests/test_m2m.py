@@ -83,6 +83,7 @@ class MetadataRecordTests(unittest.TestCase):
         self.assertTrue(date_string_regex.match(meta_date_string))
 
     def test_none_element_value_equals_none(self):
+        # if element value is None then it should return None.
 
         record = m2m.MetadataRecord('mphillips')
         self.assertEqual(record.mapping('basic', 'title', None), None)
