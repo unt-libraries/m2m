@@ -83,7 +83,6 @@ class MetadataRecordTests(unittest.TestCase):
         self.assertTrue(date_string_regex.match(meta_date_string))
 
     def test_none_element_value_equals_none(self):
-        # if element value is None then it should return None.
 
         record = m2m.MetadataRecord('mphillips')
         self.assertEqual(record.mapping('basic', 'title', None), None)
@@ -144,8 +143,8 @@ class MetadataRecordTests(unittest.TestCase):
         with self.assertRaises(m2m.MetadataConverterException) as cm:
             record.mapping('agent', 'title', 'test')
 
-        expected_error = 'Element title should be of basic type, but you' \
-                         ' are attempting to add it as agent type.'
+        expected_error = 'Element "title" should be of basic type, but you' \
+                         ' are attempting to add it as "agent" type.'
         self.assertEqual(str(cm.exception), expected_error)
 
     def test_split_function_of_map(self):

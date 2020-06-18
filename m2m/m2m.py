@@ -100,7 +100,8 @@ class MetadataRecord(object):
 
         if fieldTypes[elementName] != elementType:
             raise MetadataConverterException(
-                    'Element %s should be of %s type, but you are attempting to add it as %s type.'
+                    'Element "%s" should be of %s type, but you are attempting'
+                    ' to add it as "%s" type.'
                     % (elementName, fieldTypes[elementName], elementType))
 
         if location.strip() != '' and elementName != 'publisher':
