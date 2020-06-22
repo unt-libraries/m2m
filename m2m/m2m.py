@@ -200,6 +200,7 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--json', action='store_true',
                         dest='json',
                         help='Write json version of metadata')
+
     args = parser.parse_args()
 
     print('Processing CSV file %s with mapping %s' % (args.file, args.mapping))
