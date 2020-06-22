@@ -27,7 +27,7 @@ class CSVToDictTests(unittest.TestCase):
 class MetadataRecordTests(unittest.TestCase):
 
     def setUp(self):
-        xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+        xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <title />
                 <meta qualifier='metadataCreator'></meta>
@@ -35,7 +35,7 @@ class MetadataRecordTests(unittest.TestCase):
         """
         self.tree = objectify.fromstring(xml)
 
-        agent_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+        agent_xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <creator>
                     <name />
@@ -47,7 +47,7 @@ class MetadataRecordTests(unittest.TestCase):
         """
         self.agent_tree = objectify.fromstring(agent_xml)
 
-        pub_xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+        pub_xml = b"""<?xml version='1.0' encoding='UTF-8'?>
             <metadata>
                 <publisher>
                     <name />
@@ -59,7 +59,7 @@ class MetadataRecordTests(unittest.TestCase):
         self.pub_tree = objectify.fromstring(pub_xml)
 
     def test_metadata_record_setup(self):
-        # test that the creation of a record creates a MetadataRecord object.
+        """Test that the creation of a record creates a MetadataRecord object."""
 
         record = m2m.MetadataRecord('mphillips')
         self.assertIsInstance(record, m2m.MetadataRecord)
@@ -93,8 +93,7 @@ class MetadataRecordTests(unittest.TestCase):
         # then map should return None.
 
         record = m2m.MetadataRecord('mphillips')
-        self.assertEqual(record.mapping('basic', 'title', '', required=False),
-                          None)
+        self.assertEqual(record.mapping('basic', 'title', '', required=False), None)
 
     def test_set_base_directory(self):
 
@@ -203,9 +202,9 @@ class MetadataRecordTests(unittest.TestCase):
     def test_basic_map_qualified_basic_with_function(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('basic', 'title', 'test_title',
-                   qualifier='officialtitle',
-                   function=(lambda x: x.upper())
-                   )
+                       qualifier='officialtitle',
+                       function=(lambda x: x.upper())
+                       )
 
         self.tree.title = 'TEST_TITLE'
         self.tree.title.set('qualifier', 'officialtitle')
@@ -229,9 +228,9 @@ class MetadataRecordTests(unittest.TestCase):
     def test_agent_map_qualified_with_function(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('agent', 'creator', 'Phillips, Mark',
-                   qualifier='aut',
-                   function=(lambda x: x.upper())
-                   )
+                       qualifier='aut',
+                       function=(lambda x: x.upper())
+                       )
 
         self.agent_tree.creator.name = 'PHILLIPS, MARK'
         del self.agent_tree.creator.info
@@ -258,7 +257,7 @@ class MetadataRecordTests(unittest.TestCase):
     def test_agent_map_qualified_info_only(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('agent', 'creator', 'Phillips, Mark',
-                   qualifier='aut', info='First Publication')
+                       qualifier='aut', info='First Publication')
 
         self.agent_tree.creator.info = 'First Publication'
         self.agent_tree.creator.name = 'Phillips, Mark'
@@ -269,13 +268,12 @@ class MetadataRecordTests(unittest.TestCase):
 
         self.assertEqual(bytes(record), xml_to_pretty_string(self.agent_tree))
 
-
     def test_agent_map_qualified_info_and_agent_type(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('agent', 'creator', 'Phillips, Mark',
-                   qualifier='aut',
-                   info='First Publication',
-                   agent_type='per')
+                       qualifier='aut',
+                       info='First Publication',
+                       agent_type='per')
 
         self.agent_tree.creator.info = 'First Publication'
         self.agent_tree.creator.name = 'Phillips, Mark'
@@ -289,7 +287,7 @@ class MetadataRecordTests(unittest.TestCase):
     def test_agent_map_qualified_with_location(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('agent', 'publisher', 'UNT Libraries',
-                   location='Denton, Texas')
+                       location='Denton, Texas')
 
         self.pub_tree.publisher.name = 'UNT Libraries'
         self.pub_tree.publisher.location = 'Denton, Texas'
@@ -304,7 +302,7 @@ class MetadataRecordTests(unittest.TestCase):
 
         with self.assertRaises(m2m.MetadataConverterException) as cm:
             record.mapping('agent', 'creator', 'Phillips, Mark',
-                       location='aut')
+                           location='aut')
 
         expected_error = 'location can only be used on publisher element'
         self.assertEqual(str(cm.exception), expected_error)
@@ -312,7 +310,7 @@ class MetadataRecordTests(unittest.TestCase):
     def test_write_xml_metadata_file(self):
         record = m2m.MetadataRecord('mphillips')
         record.mapping('agent', 'publisher', 'UNT Libraries',
-                   location='Denton, Texas')
+                       location='Denton, Texas')
         record.setBaseDirectory('tests')
         record.setFolderName('test_data')
 
@@ -322,7 +320,7 @@ class MetadataRecordTests(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(
                                        record.baseDirectory, record.foldername)))
         self.assertTrue(os.path.exists(os.path.join(
-                                       record.baseDirectory, record.foldername, "metadata.xml")))
+                                       record.baseDirectory, record.foldername, 'metadata.xml')))
 
         self.pub_tree.publisher.name = 'UNT Libraries'
         self.pub_tree.publisher.location = 'Denton, Texas'
@@ -368,6 +366,7 @@ def suite():
     all_tests.addTest(unittest.makeSuite(MetadataRecordTests))
 
     return all_tests
+
 
 if __name__ == '__main__':
     unittest.main()
