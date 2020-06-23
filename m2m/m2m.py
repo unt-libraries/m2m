@@ -182,43 +182,36 @@ class MetadataRecord(object):
 if __name__ == '__main__':
 
     parser = ArgumentParser()
-
-    parser.add_argument('mapping',
-                        help='Specify the mapping file to use for this CSV')
-
-    parser.add_argument('file',
+    parser.add_argument('csv_file',
                         help='Specify a CSV file to process.')
-
+    parser.add_argument('-m', '--mapping', required=True,
+                        help='Specify the mapping file to use for this CSV')
     parser.add_argument('-n', '--row', type=int,
                         dest='row',
                         help='Specify a single row number to process')
-
     parser.add_argument('-w', '--write', action='store_true',
                         dest='write',
                         help='Write records to files')
-
     parser.add_argument('-j', '--json', action='store_true',
                         dest='json',
                         help='Write json version of metadata')
-
     args = parser.parse_args()
 
-    print('Processing CSV file %s with mapping %s' % (args.file, args.mapping))
+    print('Processing CSV file %s with mapping %s' % (args.csv_file, args.mapping))
     mappingPath = os.path.abspath(args.mapping)
-    CSVPath = os.path.abspath(args.file)
+    CSVPath = os.path.abspath(args.csv_file)
     CSVRows = CSVToDict(CSVPath)
     localDict = {}
-
     exec(compile(open(mappingPath).read(), mappingPath, 'exec'), {}, localDict)
-
     mappingFunction = localDict['processRecord']
 
     if args.row:
+        if args.row < 0:
+            sys.exit("%s is an invalid positive int value" % args.row)
         try:
             CSVRows = [CSVRows[args.row - 1]]
         except IndexError:
-            print('Sorry, %s is not a valid row number.' % args.row)
-            sys.exit(1)
+            sys.exit('Sorry, %s is not a valid row number.' % args.row)
 
     for x in range(len(CSVRows)):
         row = CSVRows[x]
