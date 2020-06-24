@@ -207,7 +207,7 @@ if __name__ == '__main__':
 
     if args.row:
         if args.row < 0:
-            sys.exit("%s is an invalid positive int value" % args.row)
+            sys.exit('row must be a positive integer.')
         try:
             CSVRows = [CSVRows[args.row - 1]]
         except IndexError:
