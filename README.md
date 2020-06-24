@@ -38,7 +38,7 @@ This application can be installed by following the steps below:
 
 This application can be run using following command with example files.
 
-    $ python m2m/m2m.py tests/data/test.csv -m tests/data/test_2_untl.py
+    $ python m2m/m2m.py -m tests/data/test_2_untl.py tests/data/test.csv
 
 Testing
 -------

@@ -3,7 +3,7 @@ import time
 import os
 import sys
 import json
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 from pyuntl.untl_structure import PYUNTL_DISPATCH
 from pyuntl.untldoc import untlpydict2xmlstring, untlpy2dict
@@ -144,8 +144,6 @@ class MetadataRecord(object):
                 self.root_element.add_child(agent)
 
     def writeTemplateFiles(self, baseDirectory, foldername):
-        baseDirectory = baseDirectory
-        foldername = foldername
         writeDirectory = os.path.join(baseDirectory, foldername)
         try:
             os.makedirs(writeDirectory)
@@ -162,8 +160,6 @@ class MetadataRecord(object):
         return '%s finished' % foldername
 
     def writeJSONFile(self, baseDirectory, foldername, data):
-        baseDirectory = baseDirectory
-        foldername = foldername
         writeDirectory = os.path.join(baseDirectory, foldername)
         try:
             os.makedirs(writeDirectory)
@@ -185,62 +181,45 @@ class MetadataRecord(object):
 
 if __name__ == '__main__':
 
-    usage = 'usage: %prog [options] <csv file>'
+    parser = ArgumentParser()
+    parser.add_argument('csv_file',
+                        help='Specify a CSV file to process.')
+    parser.add_argument('-m', '--mapping', required=True,
+                        help='Specify the mapping file to use for this CSV')
+    parser.add_argument('-n', '--row', type=int,
+                        dest='row',
+                        help='Specify a single row number to process')
+    parser.add_argument('-w', '--write', action='store_true',
+                        dest='write',
+                        help='Write records to files')
+    parser.add_argument('-j', '--json', action='store_true',
+                        dest='json',
+                        help='Write json version of metadata')
+    args = parser.parse_args()
 
-    parser = OptionParser(usage=usage)
-
-    parser.add_option('-m', '--mapping', action='store', type='string',
-                      dest='mapping',
-                      help='Specify the mapping file to use for this CSV')
-
-    parser.add_option('-n', '--row', action='store', type='int',
-                      dest='row',
-                      help='Specify a single row number to process')
-
-    parser.add_option('-w', '--write', action='store_true',
-                      dest='write',
-                      help='Write records to files')
-
-    parser.add_option('-j', '--json',
-                      action='store_true',
-                      dest='json',
-                      help='UWrite json version of metadata')
-
-    (options, args) = parser.parse_args()
-
-    if not options.mapping:
-        parser.error('You must supply a mapping file.')
-
-    if not len(args):
-        parser.error('You must supply a CSV file to process.')
-
-    print('Processing CSV file %s with mapping %s' % (args[0], options.mapping))
-
-    mappingPath = os.path.abspath(options.mapping)
-    CSVPath = os.path.abspath(args[0])
-
+    print('Processing CSV file %s with mapping %s' % (args.csv_file, args.mapping))
+    mappingPath = os.path.abspath(args.mapping)
+    CSVPath = os.path.abspath(args.csv_file)
     CSVRows = CSVToDict(CSVPath)
-
     localDict = {}
-
     exec(compile(open(mappingPath).read(), mappingPath, 'exec'), {}, localDict)
-
     mappingFunction = localDict['processRecord']
 
-    if options.row:
+    if args.row:
+        if args.row < 0:
+            sys.exit('row must be a positive integer.')
         try:
-            CSVRows = [CSVRows[options.row - 1]]
+            CSVRows = [CSVRows[args.row - 1]]
         except IndexError:
-            print('Sorry, %s is not a valid row number.' % options.row)
-            sys.exit(1)
+            sys.exit('Sorry, %s is not a valid row number.' % args.row)
+
     for x in range(len(CSVRows)):
         row = CSVRows[x]
-
-        if options.write:
+        if args.write:
             print('Writing record for row %s' % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeTemplateFiles(record.baseDirectory, record.foldername)
-        if options.json:
+        if args.json:
             print('Writing json record for row %s' % x)
             record = mappingFunction(MetadataRecord, row)
             record.writeJSONFile(record.baseDirectory, record.foldername, row)
