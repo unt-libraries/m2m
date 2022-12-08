@@ -5,7 +5,7 @@ import sys
 import json
 from argparse import ArgumentParser
 
-from pyuntl.untl_structure import PYUNTL_DISPATCH
+from pyuntl.untl_structure import PYUNTL_DISPATCH, get_vocabularies
 from pyuntl.untldoc import untlpydict2xmlstring, untlpy2dict
 
 
@@ -143,6 +143,59 @@ class MetadataRecord(object):
                         PYUNTL_DISPATCH['type'](content=agent_type.strip()))
                 self.root_element.add_child(agent)
 
+    def validate(self):
+        record_dict = untlpy2dict(self.root_element)
+        for element in record_dict:
+            if element == 'title':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['title-qualifiers'])
+            if element in {'creator', 'contributor'}:
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['agent-qualifiers'])
+                for agent in record_dict[element]:
+                    if agent['content']['type'] not in VOCAB_CACHE['agent-type']:
+                        raise MetadataConverterException('{} qualifier {} not in {} vocabulary'.format(element, agent['content']['type'], 'agent-type'))
+            if element == 'publisher':
+                pass # No current validation rules.
+            if element == 'date':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['date-qualifiers'])
+            if element == 'description':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['description-qualifiers'])
+            if element == 'subject':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['subject-qualifiers'])
+            if element == 'coverage':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['coverage-qualifiers'])
+            if element == 'source':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['sourceQualifiers'])
+            if element == 'relation':
+                pass
+            if element == 'collection':
+                pass
+            if element == 'institution':
+                pass
+            if element == 'rights':
+                pass
+            if element == 'resourceType':
+                pass
+            if element == 'format':
+                pass
+            if element == 'identifier':
+                pass
+            if element == 'note':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['note-qualifiers'])
+            if element == 'degree':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['degree-qualifiers'])
+            if element == 'meta':
+                self.validQualifiers(element, record_dict[element], VOCAB_CACHE['meta-qualifiers'])
+            if element == 'primarySource':
+                pass
+            if element == 'citation':
+                pass
+
+    def validQualifiers(self, element, element_list, qualifier_set, empty=False):
+        for instance in element_list:
+            if instance['qualifier'] not in qualifier_set:
+                raise MetadataConverterException('{} qualifier {} not in {} vocabulary'.format(element, instance['qualifier'], qualifier_set))
+        return True
+
     def writeTemplateFiles(self, baseDirectory, foldername):
         writeDirectory = os.path.join(baseDirectory, foldername)
         try:
@@ -178,6 +231,11 @@ class MetadataRecord(object):
 
         return '%s finished JSON' % foldername
 
+def simplify_vocab_cache(VOCAB_CACHE):
+        VOCAB_CACHE_SIMPLE = {}
+        for v in VOCAB_CACHE:
+            VOCAB_CACHE_SIMPLE[v] = set([term['name'] for term in VOCAB_CACHE[v]])
+        return VOCAB_CACHE_SIMPLE
 
 if __name__ == '__main__':
 
@@ -195,6 +253,9 @@ if __name__ == '__main__':
     parser.add_argument('-j', '--json', action='store_true',
                         dest='json',
                         help='Write json version of metadata')
+    parser.add_argument('-v', '--validate', action='store_true',
+                        dest='validate',
+                        help="Validate the Mapping Python file.")
     args = parser.parse_args()
 
     print('Processing CSV file %s with mapping %s' % (args.csv_file, args.mapping))
@@ -205,6 +266,14 @@ if __name__ == '__main__':
     exec(compile(open(mappingPath).read(), mappingPath, 'exec'), {}, localDict)
     mappingFunction = localDict['processRecord']
 
+    if args.validate:
+        VOCAB_CACHE = simplify_vocab_cache(get_vocabularies())
+        print('we should validate')
+        for x in range(len(CSVRows)):
+            row = CSVRows[x]
+            record = mappingFunction(MetadataRecord, row)
+            record.validate()
+        exit()
     if args.row:
         if args.row < 0:
             sys.exit('row must be a positive integer.')
